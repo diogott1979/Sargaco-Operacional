@@ -1,0 +1,13 @@
+SARGAÇO FLUTUANTE | STREAMLIT PROTEGIDO
+
+1. Crie um NOVO repositório no GitHub para a versão Streamlit (não use o mesmo repositório GitHub Pages da versão pública).
+2. Carregue APENAS os ficheiros deste ZIP.
+3. Em share.streamlit.io crie uma app ligada ao novo repositório, com ficheiro principal app.py.
+4. No painel Settings > Secrets, cole o conteúdo do ficheiro PRIVADO entregue SEPARADAMENTE (não publique esse ficheiro).
+5. Substitua ALTERAR_PALAVRA_PASSE por palavra-passe única forte (12+ caracteres), sem partilhar a palavra-passe no GitHub.
+6. Valide os contactos antes de usar operacionalmente.
+7. Após publicar a aplicação Streamlit, remova os contactos municipais do repositório público GitHub Pages, pois uma palavra-passe não protege os dados já públicos.
+
+NOTAS: O mapa e os seus recursos são carregados como arquivos estáticos públicos do próprio Streamlit; os contactos municipais não estão incluídos nesses arquivos. São transmitidos ao navegador apenas após entrada autenticada. Uma palavra-passe partilhada não permite auditar operadores nem garante uma barreira robusta contra ataques sistemáticos. O limite de tentativas é por sessão, não global. Para dados mais sensíveis, use autenticação individual/SSO.
+
+A versão foi verificada estaticamente, mas não testada de ponta a ponta numa instância Streamlit publicada.

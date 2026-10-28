@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="pt-PT"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ffffff"><title>Sargaço Flutuante | Portal Operacional</title>
+<link rel="stylesheet" href="resources/ol.css"><link rel="stylesheet" href="resources/ol-layerswitcher.css"><link rel="stylesheet" href="resources/qgis2web.css"><link rel="stylesheet" href="resources/fontawesome-all.min.css"><link rel="stylesheet" href="app.css">
+</head><body>
+<div class="app-shell">
+<header class="app-header"><div class="identity"><div class="brand-symbol" aria-hidden="true">✦</div><div><span class="eyebrow">PORTAL OPERACIONAL · CARTOGRAFIA</span><h1>Sargaço Flutuante</h1></div></div><span class="header-tag">REGIÃO AUTÓNOMA DA MADEIRA</span></header>
+<main class="workspace"><aside class="sidebar" id="sidebar">
+<section class="panel"><div class="panel-heading"><span class="section-icon">⌖</span><div><h2>Consultar localização</h2><p>Introduza coordenadas WGS84, em graus decimais.</p></div></div>
+<form id="coord-input-form" novalidate><div class="form-grid"><label>Latitude <input id="latitude" name="latitude" inputmode="decimal" autocomplete="off" placeholder="Ex.: 32.644002" required></label><label>Longitude <input id="longitude" name="longitude" inputmode="decimal" autocomplete="off" placeholder="Ex.: -16.908906" required></label></div><button id="add-coordinates" class="primary" type="submit">⌖ &nbsp; Localizar coordenadas</button></form>
+<div id="feedback" class="feedback" role="status" aria-live="polite">Introduza uma latitude e uma longitude para iniciar a consulta.</div></section>
+<section class="panel"><div class="panel-heading slim"><div><h2>Resultado da consulta</h2><p>Classificação indicativa segundo as camadas disponíveis.</p></div></div><div id="result" class="result" aria-live="polite"><div class="empty">Nenhum ponto selecionado.</div></div><div class="actions"><button id="copy-coords" type="button" disabled>Copiar coordenadas</button><button id="refresh-points" type="button">Limpar pontos</button></div></section>
+<section class="panel"><div class="panel-heading slim"><div><h2>Camadas cartográficas</h2><p>Mostre ou oculte as áreas de referência.</p></div></div><div class="layers-controls"><label><input type="checkbox" data-layer="port" checked><i class="swatch" style="--swatch:#89d610"></i> Áreas portuárias</label><label><input type="checkbox" data-layer="municipios" checked><i class="swatch" style="--swatch:#3947c4"></i> Municípios</label><label><input type="checkbox" data-layer="ifcn" checked><i class="swatch" style="--swatch:#987db7"></i> IFCN</label><label><input type="checkbox" data-layer="balneares" checked><i class="swatch" style="--swatch:#e31a1c"></i> Águas balneares</label></div></section>
+<p class="sidebar-note">A cartografia não substitui a confirmação da jurisdição junto da entidade competente. Contactos constantes da base original requerem validação.</p>
+</aside><section class="map-panel" aria-label="Mapa interativo"><div id="map"><div id="popup" class="ol-popup"><a href="#" id="popup-closer" class="ol-popup-closer" aria-label="Fechar"></a><div id="popup-content"></div></div></div><div class="map-toolbar"><button id="view-madeira" type="button">Madeira</button><button id="view-porto-santo" type="button">Porto Santo</button><button id="reset-map" type="button" title="Vista inicial">⟲ Recentrar</button></div><div class="map-credits">SRPC · DAROT | Dados geográficos fornecidos na versão original</div></section></main></div>
+<script src="resources/qgis2web_expressions.js"></script><script src="resources/proj4.js"></script><script>proj4.defs('EPSG:5016','+proj=utm +zone=28 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs');</script>
+<script src="resources/functions.js"></script><script src="resources/ol.js"></script><script src="resources/ol-layerswitcher.js"></script>
+<script src="layers/Areas_Portuarias_RAM_1.js"></script><script src="layers/Madeira_Municipios_CAOP2023_2.js"></script><script src="layers/IFCN_3.js"></script><script src="layers/DRAAC_AguasBalneares_4.js"></script>
+<script src="styles/Areas_Portuarias_RAM_1_style.js"></script><script src="styles/Madeira_Municipios_CAOP2023_2_style.js"></script><script src="styles/IFCN_3_style.js"></script><script src="styles/DRAAC_AguasBalneares_4_style.js"></script>
+<script src="layers/layers.js"></script><script src="resources/Autolinker.min.js"></script><script src="resources/qgis2web.js"></script><script src="map.js?v=20261028-3"></script>
+</body></html>
