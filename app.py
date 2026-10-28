@@ -1,6 +1,5 @@
 """Sargaço Flutuante — aplicação operacional protegida."""
 from pathlib import Path
-from urllib.parse import urlsplit
 import json
 import hmac
 import re
@@ -59,20 +58,58 @@ with h2:
         st.session_state.autenticado = False
         st.rerun()
 
-# Carregar a página original apenas após autenticação. Os dados públicos estão
-# em /app/static/ e os telefones são injetados unicamente na sessão autenticada.
-app_url = st.context.url
-parts = urlsplit(app_url)
-if parts.scheme not in ("http", "https") or not parts.netloc:
-    st.error("Endereço de acesso inválido.")
+# A versão incorporada é autónoma: todos os estilos e scripts públicos
+# são incluídos no HTML entregue APENAS a uma sessão autenticada.
+# Evita falhas de caminhos relativos /app/static/ dentro do iframe do Streamlit.
+@st.cache_data(show_spinner=False)
+def criar_mapa_autonomo():
+    pagina = (ROOT / "map_template.html").read_text(encoding="utf-8")
+    pasta_publica = (ROOT / "static").resolve()
+
+    def carregar_recurso(caminho):
+        recurso = (pasta_publica / caminho.split("?", 1)[0]).resolve()
+        if not recurso.is_relative_to(pasta_publica) or not recurso.is_file():
+            raise FileNotFoundError(f"Recurso cartográfico não encontrado: {caminho}")
+        return recurso.read_text(encoding="utf-8")
+
+    def substituir_estilo(resultado):
+        endereco = resultado.group(1)
+        css = carregar_recurso(endereco)
+        return "<style>\n" + css + "\n</style>"
+
+    def substituir_script(resultado):
+        endereco = resultado.group(1)
+        js = carregar_recurso(endereco)
+        # Os recursos utilizados não incluem fechos literais de <script>.
+        if re.search(r"</script\s*>", js, flags=re.I):
+            raise ValueError(f"Fecho HTML inesperado no JavaScript: {endereco}")
+        return "<script>\n" + js + "\n</script>"
+
+    pagina = re.sub(
+        r'<link\s+rel="stylesheet"\s+href="([^"]+)"\s*/?>',
+        substituir_estilo, pagina,
+    )
+    pagina = re.sub(
+        r'<script\s+src="([^"]+)"\s*></script>',
+        substituir_script, pagina,
+    )
+    return pagina
+
+try:
+    pagina = criar_mapa_autonomo()
+except (OSError, ValueError) as exc:
+    st.error(f"Não foi possível carregar os recursos do mapa: {exc}")
     st.stop()
-static_base = f"{parts.scheme}://{parts.netloc}/app/static/"
-page = (ROOT / "map_template.html").read_text(encoding="utf-8")
-# Mapear apenas os contactos permitidos. Os dados são divulgados ao operador
-# autenticado no browser, como é inerente à sua consulta.
-filtered_contacts = {str(k): str(v) for k, v in contacts.items() if str(v).strip()}
-private_script = "<script>window.SARGACO_MUNICIPAL_CONTACTS = " + json.dumps(filtered_contacts, ensure_ascii=False).replace("<", "\\u003c") + ";</script>"
-page = page.replace("<head>", '<head><base href="'+ static_base +'">', 1)
-page = re.sub(r'<script\s+src="map\.js(?:\?[^" ]*)?"\s*></script>', lambda match: private_script + '<script src="map.js"></script>', page)
-components.html(page, height=860, scrolling=False)
-st.caption("A indicação de jurisdição é orientadora e não substitui a confirmação com a entidade competente. Os contactos devem ser validados operacionalmente.")
+
+# Os contactos municipais NÃO estão nos ficheiros cartográficos públicos.
+# Só são incorporados depois de validada a palavra-passe, na sessão atual.
+contactos_permitidos = {str(k): str(v) for k, v in contacts.items() if str(v).strip()}
+dados_contactos = json.dumps(contactos_permitidos, ensure_ascii=False).replace("<", "\\u003c")
+script_privado = (
+    "<script>window.SARGACO_MUNICIPAL_CONTACTS = "
+    + dados_contactos + ";</script>"
+)
+pagina = pagina.replace("</head>", script_privado + "</head>", 1)
+
+components.html(pagina, height=900, scrolling=False)
+st.caption("A jurisdição indicada é orientadora; confirme com a entidade competente. Valide os contactos antes de os utilizar operacionalmente.")
