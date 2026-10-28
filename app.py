@@ -10,12 +10,19 @@ ROOT = Path(__file__).resolve().parent
 st.set_page_config(page_title="Sargaço Flutuante | SALOC", page_icon="🛡️", layout="wide", initial_sidebar_state="collapsed")
 st.markdown("""<style>
 [data-testid="stAppViewContainer"]{background:#f8fafc;color:#21324b}
-.block-container{max-width:1550px;padding-top:1.4rem;padding-bottom:1rem}
+.block-container{max-width:100%!important;width:100%!important;padding:0.7rem 1.2rem 0.7rem!important;}
+[data-testid="stMainBlockContainer"]{max-width:100%!important;}
+[data-testid="stVerticalBlock"]{gap:.55rem;}
+@media(max-width:700px){.block-container{padding:.6rem!important;}}
 [data-testid="stHeader"]{background:transparent}
 </style>""", unsafe_allow_html=True)
 
-st.title("🛡️ Sargaço Flutuante")
-st.caption("Serviço Regional de Proteção Civil, IP-RAM · SALOC · Consulta cartográfica")
+# Mantém o título na entrada e mostra um cabeçalho compacto após autenticação.
+if not st.session_state.get("autenticado", False):
+    st.title("🛡️ Sargaço Flutuante")
+    st.caption("Serviço Regional de Proteção Civil, IP-RAM · SALOC · Consulta cartográfica")
+else:
+    st.markdown('<div style="font-size:1.18rem;font-weight:750;color:#21324b;line-height:1.3">🛡️ Sargaço Flutuante <span style="font-size:.78rem;color:#64748b;font-weight:500">| SALOC · Consulta cartográfica</span></div>', unsafe_allow_html=True)
 
 try:
     password = str(st.secrets["acesso"]["palavra_passe"])
@@ -109,7 +116,20 @@ script_privado = (
     "<script>window.SARGACO_MUNICIPAL_CONTACTS = "
     + dados_contactos + ";</script>"
 )
-pagina = pagina.replace("</head>", script_privado + "</head>", 1)
+# A página incorporada deixa de repetir o cabeçalho do Streamlit.
+# As regras são locais ao iframe, não afetam o ecrã de autenticação.
+estilo_integracao = """<style>
+html,body,.app-shell{height:100%!important;overflow:hidden!important}
+.app-header{display:none!important}
+.workspace{height:100%!important;min-height:0!important}
+.sidebar{width:clamp(310px,26vw,390px)!important}
+@media(max-width:850px){
+ .workspace{flex-direction:column!important}
+ .sidebar{width:100%!important;max-height:44%!important}
+ .map-panel{min-height:45%!important}
+}
+</style>"""
+pagina = pagina.replace("</head>", script_privado + estilo_integracao + "</head>", 1)
 
-components.html(pagina, height=900, scrolling=False)
+components.html(pagina, height=970, scrolling=False)
 st.caption("A jurisdição indicada é orientadora; confirme com a entidade competente. Valide os contactos antes de os utilizar operacionalmente.")
